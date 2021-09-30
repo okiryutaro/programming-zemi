@@ -4,6 +4,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @tweets = @user.tweets
   end
 
   def new
@@ -34,18 +35,29 @@ class UsersController < ApplicationController
     end
   end
 
+  def following
+    @title = "フォロー中"
+    @user = User.find(params[:id])
+    @users = @user.following_user.paginate(page: params[:page])
+    render 'show_follow'
+  end
+
+  def followers
+    @title = "フォロワー"
+    @user = User.find(params[:id])
+    @users = @user.follower_user.paginate(page: params[:page])
+    render 'show_follow'
+  end
+
+
+
   private
 	
 	def user_params
 		params.require(:user).permit(:name, :email, :password, :password_confirmation)
 	end
 
-  def logged_in_user
-    unless logged_in?
-      flash[:danger] = "ログインしてください"
-      redirect_to login_url
-    end
-  end
+
 
   # 正しいユーザーかどうか確認
   def correct_user
